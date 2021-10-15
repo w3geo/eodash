@@ -80,6 +80,11 @@ const mutations = {
       state.dashboardConfig.marketingInfo = marketingInfo;
     }
   },
+  RESET_MARKETING_INFO(state) {
+    if (state.dashboardConfig.marketingInfo) {
+      state.dashboardConfig.marketingInfo = null;
+    }
+  },
   RESIZE_FEATURE_SHRINK(state, { poi }) {
     state.dashboardConfig.features.find((e) => e.poi === poi).width -= 1;
   },

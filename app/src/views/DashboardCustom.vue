@@ -14,7 +14,7 @@
         class="white--text"
       >
         <a
-          @click="$store.state.dashboard.featureAdded
+          @click="$store.state.indicators.selectedIndicator
             ? $router.go(-1)
             : $router.push({ path: '/' })"
           class="white--text" style="text-decoration: none">
@@ -100,6 +100,7 @@
             </div>
           </div>
         </v-col>
+                    <v-btn @click="forkDashboard">Fork</v-btn>
         <v-col
           cols="12"
           md="6"
@@ -336,6 +337,7 @@
       </v-row>
       <v-divider v-if="$vuetify.breakpoint.smAndDown" class="my-10"></v-divider>
       <custom-dashboard-grid
+        v-if="$store.state.features.allFeatures.length > 0"
         :enableEditing="!!(newDashboard || hasEditingPrivilege)"
         :popupOpen="popupOpen || newTextFeatureDialog"
         @updateTextFeature="openTextFeatureUpdate"
@@ -441,6 +443,7 @@
 import {
   mapState,
   mapActions,
+  mapMutations,
 } from 'vuex';
 
 import GlobalFooter from '@/components/GlobalFooter.vue';
@@ -525,7 +528,8 @@ export default {
       'dashboardConfig',
     ]),
     newDashboard() {
-      return !this.$store.state.dashboard?.dashboardConfig?.marketingInfo;
+      return this.$store.state.dashboard.dashboardConfig
+        && !this.$store.state.dashboard?.dashboardConfig?.marketingInfo;
     },
     hasEditingPrivilege() {
       return this.$store.state.dashboard?.dashboardConfig?.editKey;
@@ -542,7 +546,7 @@ export default {
         ? `${window.location.origin}/dashboard?id=${this.$store.state.dashboard.dashboardConfig.id}&editKey=${this.$store.state.dashboard.dashboardConfig.editKey}`
         : 'Loading...';
     },
-  },
+  },  
   async created() {
     let id = null;
     let editKey = null;
@@ -564,8 +568,19 @@ export default {
       this.reconnecting = false;
     }
 
-    if (this.dashboardConfig && this.dashboardConfig.title) {
-      this.dashboardTitle = this.dashboardConfig.title;
+    if (this.dashboardConfig) {
+      if (this.dashboardConfig.title) {
+        this.dashboardTitle = this.dashboardConfig.title;
+      }
+      if (this.dashboardConfig.id && !id) {
+        this.$router.replace({
+          path: 'dashboard',
+          query: {
+            id: this.dashboardConfig.id,
+            ...this.dashboardConfig.editKey && { editKey: this.dashboardConfig.editKey },
+          },
+        });
+      }
     }
 
     if (!this.dashboardConfig) {
@@ -616,16 +631,23 @@ export default {
       'addFeature',
       'changeFeatureText',
     ]),
+    ...mapMutations('dashboard', [
+    'RESET_MARKETING_INFO',
+    ]),
+    async forkDashboard() {
+      this.RESET_MARKETING_INFO();
+      this.saveCurrentDashboardState();
+    },
     async editTitle() {
       if (this.hasEditingPrivilege || this.newDashboard) {
         this.performChange('changeTitle', this.dashboardTitle);
       }
     },
     async saveCurrentDashboardState() {
-      if (this.newDashboard) {
+      // if (this.newDashboard) {
         this.popupTitle = this.dashboardTitle;
         this.popupOpen = true;
-      }
+      // }
     },
     async submitMarketingData() {
       this.loading = true;
