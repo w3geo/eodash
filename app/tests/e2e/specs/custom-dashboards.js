@@ -1,12 +1,13 @@
 describe('Custom dashboards', () => {
   it('adds feature to custom dashboard', () => {
     cy.visit('/');
-    cy.contains('GLOBAL INDICATORS').click();
-    cy.contains('AIR QUALITY').click();
-    cy.contains('ADD TO CUSTOM DASHBOARD').click();
-    cy.contains('ADD').click();
-    cy.contains('ADDED TO CUSTOM DASHBOARD').should('exist');
-    cy.contains('CUSTOM DASHBOARD').click();
+    // cy.contains('Accept all cookies').click();
+    cy.get('.global-indicators-panel').contains('Air Quality').click();
+    // cy.contains('Air Quality').eq(1).click();
+    cy.contains('add to custom dashboard').click();
+    cy.contains('add').click();
+    cy.contains('added to custom dashboard').should('exist');
+    cy.contains('Custom Dashboard').click();
     cy.get('canvas').first().should('exist');
   });
 
