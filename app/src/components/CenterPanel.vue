@@ -1,6 +1,7 @@
 <template>
   <div class="fill-height pb-8">
-    <v-tabs
+        <Map ref="map" />
+    <!-- <v-tabs
       v-model="tab"
       icons-and-text
       grow
@@ -24,7 +25,6 @@
       class="fill-height pb-7"
     >
       <v-tab-item class="fill-height">
-        <Map ref="map" />
         <v-expansion-panels accordion class="global-indicators-panel" v-model="panel">
           <v-expansion-panel>
             <v-expansion-panel-header class="panel-header">
@@ -165,7 +165,7 @@
           </v-scroll-y-transition>
         </div>
       </v-tab-item>
-    </v-tabs-items>
+    </v-tabs-items> -->
   </div>
 </template>
 

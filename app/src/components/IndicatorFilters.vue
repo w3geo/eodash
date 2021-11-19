@@ -1,6 +1,111 @@
 <template>
   <div style="width: 100%" class="fill-height">
-    <v-tabs v-model="tab" grow activeClass="tabActive" icons-and-text>
+    <v-autocomplete
+      class="ma-3"
+      hide-details
+      solo
+      :items="selectionItems"
+      prepend-inner-icon="mdi-magnify"
+      clearable
+      @click:clear="autoCompleteClear"
+      return-object
+      @change="autoCompleteChange"
+      item-text="name"
+      label="Search locations">
+        <!-- <template v-slot:selection="data">
+          <template v-if="data.item.indicator">
+
+              <v-icon>{{
+                baseConfig.indicatorClassesIcons[data.item.class]
+                  ? baseConfig.indicatorClassesIcons[data.item.class]
+                  : "mdi-lightbulb-on-outline"
+              }}</v-icon>
+              <span v-if="data.item.indicatorOverwrite"
+                v-text="data.item.indicatorOverwrite"
+                style="
+                  text-overflow: unset;
+                  overflow: unset;
+                  white-space: pre-wrap;
+                "
+              ></span>
+              <span v-else
+                v-text="data.item.indicator"
+                style="
+                  text-overflow: unset;
+                  overflow: unset;
+                  white-space: pre-wrap;
+                "
+              ></span>
+          </template>
+          <template v-else>
+              <country-flag
+                :country="data.item.code === 'all' ? 'eu' : data.item.code"
+                size="normal"
+              />
+              {{ data.item.name }}
+          </template>
+        </template> -->
+        <template v-slot:item="data">
+          <template v-if="data.item.location">
+            <v-list-item-icon class="ml-3 mr-4">
+              <v-icon>{{
+                baseConfig.indicatorClassesIcons[data.item.class]
+                  ? baseConfig.indicatorClassesIcons[data.item.class]
+                  : "mdi-lightbulb-on-outline"
+              }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title
+                v-text="data.item.name"
+                style="
+                  text-overflow: unset;
+                  overflow: unset;
+                  white-space: pre-wrap;
+                "
+              ></v-list-item-title>
+            </v-list-item-content>
+          </template>
+          <template v-else-if="data.item.indicator">
+            <v-list-item-icon class="ml-3 mr-4">
+              <v-icon>{{
+                baseConfig.indicatorClassesIcons[data.item.class]
+                  ? baseConfig.indicatorClassesIcons[data.item.class]
+                  : "mdi-lightbulb-on-outline"
+              }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title v-if="data.item.indicatorOverwrite"
+                v-text="data.item.indicatorOverwrite"
+                style="
+                  text-overflow: unset;
+                  overflow: unset;
+                  white-space: pre-wrap;
+                "
+              ></v-list-item-title>
+              <v-list-item-title v-else
+                v-text="data.item.indicator"
+                style="
+                  text-overflow: unset;
+                  overflow: unset;
+                  white-space: pre-wrap;
+                "
+              ></v-list-item-title>
+            </v-list-item-content>
+          </template>
+          <template v-else>
+            <v-list-item-icon class="d-flex align-center mr-2">
+              <country-flag
+                :country="data.item.code === 'all' ? 'eu' : data.item.code"
+                size="normal"
+              />
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>{{ data.item.name }}</v-list-item-title>
+            </v-list-item-content>
+          </template>
+        </template>
+    </v-autocomplete>
+    <!-- <v-tabs v-model="tab" grow activeClass="tabActive" icons-and-text>
       <v-tab>
         <v-badge
           v-if="countrySelection !== 'all'"
@@ -25,12 +130,12 @@
         Indicators
         <v-icon class="mb-1">mdi-lightbulb-on-outline</v-icon>
       </v-tab>
-    </v-tabs>
-    <v-tabs-items
+    </v-tabs> -->
+    <!-- <v-tabs-items
       v-model="tab"
       :style="`height: calc(100% - 112px); overflow-y: auto`"
-    >
-      <v-tab-item class="fill-height">
+    > -->
+      <!-- <v-tab-item class="fill-height">
         <v-list
           dense
           :style="$vuetify.breakpoint.xsOnly && 'padding-bottom: 60px'"
@@ -84,14 +189,15 @@
             </template>
           </v-list-item-group>
         </v-list>
-      </v-tab-item>
-      <v-tab-item class="fill-height">
+      </v-tab-item> -->
+      <!-- <v-tab-item class="fill-height"> -->
+        <div class="fill-height" style="overflow-y: auto">
         <v-list
           dense
           :style="$vuetify.breakpoint.xsOnly && 'padding-bottom: 60px'"
         >
           <v-list-item-group v-model="indicatorSelection" color="primary">
-            <v-list-item
+            <!-- <v-list-item
               :value="'all'"
               active-class="itemActive"
               :disabled="indicatorSelection === 'all'"
@@ -103,7 +209,7 @@
                 <v-list-item-title>Available indicators</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-divider></v-divider>
+            <v-divider></v-divider> -->
             <template v-for="classId in Object.keys(uniqueClasses)">
               <v-subheader
                 class="ml-5"
@@ -157,8 +263,9 @@
             </template>
           </v-list-item-group>
         </v-list>
-      </v-tab-item>
-    </v-tabs-items>
+        </div>
+      <!-- </v-tab-item>
+    </v-tabs-items> -->
     <v-sheet
       class="d-flex align-center justify-center"
       :style="`width: 100%; height: 40px; ${$vuetify.breakpoint.xsOnly
@@ -206,11 +313,37 @@ export default {
       'getCountries',
       'getIndicators',
       'getCountryItems',
+      'getGroupedFeatures',
     ]),
     ...mapState('config', ['appConfig', 'baseConfig']),
     ...mapState('features', ['featureFilters']),
     countries() {
       return countries;
+    },
+    selectionItems() {
+      return this.countryItems
+        .concat(this.indicatorItems.map(i => ({
+        ...i,
+        name: i.indicator
+      })))
+      .concat(this.allFeatures);
+    },
+    allFeatures() {
+      return this.getGroupedFeatures.map((f) => {
+        const country = this.countryItems.find(c => c.code === f.properties.indicatorObject.country) ? this.countryItems.find(c => c.code === f.properties.indicatorObject.country).name : 'X';
+        return {
+        // country: country,
+        class: this.indicatorItems.find(i => i.code === f.properties.indicatorObject.indicator).class,
+        location: f.properties.indicatorObject.city,
+        name: `${f.properties.indicatorObject.city} (${country}): ${this.getIndicator(f.properties.indicatorObject)}`,
+        // type: this.getClass(f),
+        indicator: this.getIndicator(f.properties.indicatorObject),
+        // code: f.properties.indicatorObject.indicator,
+        // indicatorValue: this.getIndicatorLabel(f.properties.indicatorObject),
+        // indicatorColor: this.getColor(f.properties.indicatorObject),
+        indicatorObject: f.properties.indicatorObject,
+        };
+      });
     },
     countryItems() {
       let countryItems;
@@ -325,6 +458,14 @@ export default {
     });
   },
   methods: {
+    getIndicator(indObj) {
+      let ind = indObj.description;
+      if (this.baseConfig.indicatorsDefinition[indObj.indicator]
+        && this.baseConfig.indicatorsDefinition[indObj.indicator].indicatorOverwrite) {
+        ind = this.baseConfig.indicatorsDefinition[indObj.indicator].indicatorOverwrite;
+      }
+      return ind;
+    },
     selectCountry(selection) {
       if (selection === 'all') {
         this.setFilter({ countries: [] });
@@ -347,6 +488,26 @@ export default {
           (thing, index, self) => self.findIndex((t) => t === thing) === index,
         );
     },
+    autoCompleteChange(input) {
+      console.log(input);
+      if (input.indicator) {
+        if (input.indicatorObject) {
+          this.selectIndicator(input.indicatorObject.indicator);
+          this.$store.commit(
+          'indicators/SET_SELECTED_INDICATOR',
+            input.indicatorObject,
+          );
+        } else {
+          this.selectIndicator(input.code);
+        }
+      } else {
+        this.selectCountry(input.code)
+      }
+    },
+    autoCompleteClear() {
+      this.selectCountry('all');
+      this.selectIndicator('all');
+    }
   },
   watch: {
     countrySelection(val) {
