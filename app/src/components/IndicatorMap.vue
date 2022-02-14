@@ -1,6 +1,12 @@
 <template>
   <div ref="container" style="height: 100%; width: 100%;">
+    <Globe
+      v-if="indicator && indicator.indicatorName === 'TROPOMI CO'"
+      :indicator="indicator"
+      :baseLayers="baseLayers"
+    />
     <l-map
+      v-else
       ref="map"
       style="height: 100%; width: 100%; background: #cad2d3; z-index: 1;"
       :options="defaultMapOptions"
@@ -459,6 +465,7 @@ import {
   LControlLayers, LControlAttribution, LControlZoom, LLayerGroup,
   LFeatureGroup, LControl, LTooltip,
 } from 'vue2-leaflet';
+import Globe from '@/components/map/Globe.vue';
 import { DateTime } from 'luxon';
 
 import 'leaflet/dist/leaflet.css';
@@ -510,6 +517,7 @@ export default {
     LControl,
     LTooltip,
     'l-marker-cluster': Vue2LeafletMarkerCluster,
+    Globe,
   },
   data() {
     return {
